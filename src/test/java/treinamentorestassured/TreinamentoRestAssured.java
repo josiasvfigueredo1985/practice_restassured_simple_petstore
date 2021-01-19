@@ -2,30 +2,33 @@ package treinamentorestassured;
 
 import com.aventstack.extentreports.*;
 import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
+import org.json.simple.*;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
-import static io.restassured.RestAssured.*;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
-import org.json.simple.*;
-import java.lang.*;
 import java.io.*;
+import java.lang.reflect.Method;
 import java.util.*;
-import java.util.ArrayList;
-
 
 public class TreinamentoRestAssured {
 
     public static ExtentReports EXTENT_REPORT = null; //instância do report
     public static ExtentHtmlReporter HTML_REPORTER = null; //tipo do report que será gerado (html)
     public static ExtentTest TEST; //objeto que adicionaremos informações sobre os testes
-    public static String reportPath = "target/reports/"; //caminho de onde o arquivo do relatório será salvo
+    public static String reportPath = "target/surefire-reports/"; //caminho de onde o arquivo do relatório será salvo
     public static String fileName = "TreinamentoRestAssured.html"; //nome do relatório
 
-    @BeforeTest
-    public void beforSuite() {
+    @BeforeSuite
+    public void beforeSuite() {
         EXTENT_REPORT = new ExtentReports();
         HTML_REPORTER = new ExtentHtmlReporter(reportPath+"/"+fileName);
         EXTENT_REPORT.attachReporter(HTML_REPORTER);
+    }
+
+    @BeforeMethod
+    public void beforeMethod(Method method) {
+        TEST = EXTENT_REPORT.createTest(method.getName());
     }
 
     @Test
@@ -179,11 +182,10 @@ public class TreinamentoRestAssured {
                         "tags[1].name", equalTo("Adotado"),
                         "category.name", equalTo("felinos"),
                         "status", equalTo("pending"));
-
     }
 
     @Test
-    public void atualizarDadosDeUmPetInformandoIdComFormatoInválido() {
+    public void atualizarDadosDeUmPetInformandoIdComFormatoInvalido() {
         //PUT /pet
         Pet2 pet = new Pet2();
         pet.setId("111.");
@@ -228,7 +230,7 @@ public class TreinamentoRestAssured {
     }
 
     @Test
-    public void realizarRequisiçãoInformandoMétodoInválido() {
+    public void realizarRequisiçãoInformandoMétodoInvalido() {
         given().
                 baseUri("https://petstore.swagger.io/v2").
                 basePath("/pet/findByStatus?status={status}").
@@ -239,7 +241,6 @@ public class TreinamentoRestAssured {
                 then().
                 statusCode(405);//Invalid input
     }
-
 
 ////////////////////////////////////////////////--- Data Driven ---///////////////////////////////////////////////////////////////
 
@@ -383,24 +384,17 @@ public class TreinamentoRestAssured {
                         "tags[0].name", equalTo(tag1Name),
                         "status", equalTo(petStatus));
     }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Método data provider chama a função que faz a leitura dos dados do CSV
     @DataProvider(name="dataUserCSVProvider")
     public Iterator<Object []> dataUserProvider3(){
-
       return  csvProvider("src/test/java/treinamentorestassured/userData.csv");
-
     }
-
-//    @BeforeMethod
-//    public void beforeMethod(Method method) {
-//        TEST = EXTENT_REPORT.createTest(method.getName());
-//    }
 
     @Test(dataProvider = "dataUserCSVProvider")
     public void testeComDataDriven3(String[] userData) {
-
         // Apontando o dado conforme a posição de array no arquivo CSV
         // e atribuindo à variável o valor encontrado na posição do arquivo
         int userId = Integer.parseInt(userData[0]);
@@ -436,8 +430,9 @@ public class TreinamentoRestAssured {
                 .body("type", equalTo("unknown"),
                         "message", equalTo(Integer.toString(userId)));
     }
+
     @AfterMethod
-    public void afterTest(ITestResult result) {
+    public void AfterMethod(ITestResult result) {
         switch (result.getStatus())
         {
             case ITestResult.FAILURE:
@@ -455,8 +450,5 @@ public class TreinamentoRestAssured {
     @AfterSuite
     public void afterSuite(){
         EXTENT_REPORT.flush();
-
     }
-
-
 }
