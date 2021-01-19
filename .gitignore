@@ -1,0 +1,7 @@
+#Maven
+target
+#Package files
+.jar
+#Compiled
+.class
+

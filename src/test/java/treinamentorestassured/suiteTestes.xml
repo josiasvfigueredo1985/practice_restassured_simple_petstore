@@ -2,7 +2,8 @@
 <suite name="SuiteTestes" parallel="false">
     <test name="TreinamentoRestAssuredTests">
         <classes>
-            <class name="pacote/classedetetes"/>
+            <class name="treinamentorestassured.TreinamentoRestAssured"/>
         </classes>
     </test>
 </suite>
+

@@ -1,26 +1,32 @@
 package treinamentorestassured;
 
 import com.aventstack.extentreports.*;
-import org.testng.*;
+import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
+import org.testng.ITestResult;
 import org.testng.annotations.*;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import org.json.simple.*;
-import org.testng.reporters.*;
+import java.lang.*;
 import java.io.*;
-import java.lang.reflect.*;
 import java.util.*;
-
+import java.util.ArrayList;
 
 
 public class TreinamentoRestAssured {
 
-//    @BeforeSuite
-//    public void beforSuite() {
-//        EXTENT_REPORT = new ExtentReports();
-//        HTML_REPORTER = new ExtentHtmlReporter(reportPath+"/"+fileName);
-//        EXTENT_REPORT.attachReporter(HTML_REPORTER);
-//    }
+    public static ExtentReports EXTENT_REPORT = null; //instância do report
+    public static ExtentHtmlReporter HTML_REPORTER = null; //tipo do report que será gerado (html)
+    public static ExtentTest TEST; //objeto que adicionaremos informações sobre os testes
+    public static String reportPath = "target/reports/"; //caminho de onde o arquivo do relatório será salvo
+    public static String fileName = "TreinamentoRestAssured.html"; //nome do relatório
+
+    @BeforeTest
+    public void beforSuite() {
+        EXTENT_REPORT = new ExtentReports();
+        HTML_REPORTER = new ExtentHtmlReporter(reportPath+"/"+fileName);
+        EXTENT_REPORT.attachReporter(HTML_REPORTER);
+    }
 
     @Test
     public void helloWorld() {
@@ -62,9 +68,8 @@ public class TreinamentoRestAssured {
         photoURLs.add("fotosdegato.com.br/foto1.png");
         photoURLs.add("fotosdegato.com.br/foto2.png");
         pet.put("photoUrls", photoURLs);
-
-
  */
+
 /// Objetos das classes criadas
         Pet pet = new Pet();
         pet.setId(111);
@@ -96,7 +101,6 @@ public class TreinamentoRestAssured {
                         "name", equalTo("Shepherd"),
                         "tags[0].name", equalTo("Sem raça definida"),
                         "category.name", equalTo("felinos"));
-
     }
 
     @Test
@@ -139,7 +143,6 @@ public class TreinamentoRestAssured {
                 get().
                 then().
                 statusCode(404);
-
     }
 
     @Test
@@ -382,13 +385,6 @@ public class TreinamentoRestAssured {
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//    public static ExtentReports EXTENT_REPORT = null; //instância do report
-//    public static ExtentHtmlReporter HTML_REPORTER = null; //tipo do report que será gerado (html)
-//    public static ExtentTest TEST; //objeto que adicionaremos informações sobre os testes
-//    public static String reportPath = "target/reports/"; //caminho de onde o arquivo do relatório será salvo
-//    public static String fileName = "TreinamentoRestAssured.html"; //nome do relatório
-
-
     // Método data provider chama a função que faz a leitura dos dados do CSV
     @DataProvider(name="dataUserCSVProvider")
     public Iterator<Object []> dataUserProvider3(){
@@ -440,25 +436,27 @@ public class TreinamentoRestAssured {
                 .body("type", equalTo("unknown"),
                         "message", equalTo(Integer.toString(userId)));
     }
-//    @AfterMethod
-//    public void afterTest(ITestResult result) {
-//        switch (result.getStatus())
-//        {
-//            case ITestResult.FAILURE:
-//                TEST.log(Status.FAIL, result.getThrowable().toString());
-//                break;
-//            case ITestResult.SKIP:
-//                TEST.log(Status.SKIP, result.getThrowable().toString());
-//                break;
-//            default:
-//                TEST.log(Status.PASS, "Sucesso");
-//                break;
-//        }
-//    }
-//TEST.log(Status.INFO, "informação desejada");
-//
-//    @AfterSuite
-//    public void afterSuite(){
-//        EXTENT_REPORT.flush();
-//    }
+    @AfterMethod
+    public void afterTest(ITestResult result) {
+        switch (result.getStatus())
+        {
+            case ITestResult.FAILURE:
+                TEST.log(Status.FAIL, result.getThrowable().toString());
+                break;
+            case ITestResult.SKIP:
+                TEST.log(Status.SKIP, result.getThrowable().toString());
+                break;
+            default:
+                TEST.log(Status.PASS, "Sucesso");
+                break;
+        }
+    }
+
+    @AfterSuite
+    public void afterSuite(){
+        EXTENT_REPORT.flush();
+
+    }
+
+
 }
